@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar Monitoring Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Solar Monitoring Dashboard</h1>
+        <div id="data">
+            <h2>Photo Sensors</h2>
+            <table id="photo_sensors">
+                <tr>
+                    <th>Plant ID</th>
+                    <th>Location</th>
+                    <th>Reading (lux)</th>
+                    <th>Timestamp</th>
+                </tr>
+            </table>
+            <h2>Temperature Sensors</h2>
+            <table id="temperature_sensors">
+                <tr>
+                    <th>Plant ID</th>
+                    <th>Location</th>
+                    <th>Reading (°C)</th>
+                    <th>Timestamp</th>
+                </tr>
+            </table>
+            <h2>Voltage Sensors</h2>
+            <table id="voltage_sensors">
+                <tr>
+                    <th>Plant ID</th>
+                    <th>Location</th>
+                    <th>Reading (V)</th>
+                    <th>Timestamp</th>
+                </tr>
+            </table>
+            <h2>Current Sensors</h2>
+            <table id="current_sensors">
+                <tr>
+                    <th>Plant ID</th>
+                    <th>Location</th>
+                    <th>Reading (A)</th>
+                    <th>Timestamp</th>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <script>
+        const photoSensorsTable = document.getElementById('photo_sensors');
+        const temperatureSensorsTable = document.getElementById('temperature_sensors');
+        const voltageSensorsTable = document.getElementById('voltage_sensors');
+        const currentSensorsTable = document.getElementById('current_sensors');
+
+        const ws = new WebSocket('ws://localhost:8000/ws');
+
+        ws.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+
+            photoSensorsTable.innerHTML = '<tr><th>Plant ID</th><th>Location</th><th>Reading (lux)</th><th>Timestamp</th></tr>';
+            temperatureSensorsTable.innerHTML = '<tr><th>Plant ID</th><th>Location</th><th>Reading (°C)</th><th>Timestamp</th></tr>';
+            voltageSensorsTable.innerHTML = '<tr><th>Plant ID</th><th>Location</th><th>Reading (V)</th><th>Timestamp</th></tr>';
+            currentSensorsTable.innerHTML = '<tr><th>Plant ID</th><th>Location</th><th>Reading (A)</th><th>Timestamp</th></tr>';
+
+            data.photo_sensors.sort((a, b) => a.plant_id - b.plant_id).forEach(sensor => {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td>${sensor.plant_id}</td><td>${sensor.location}</td><td>${sensor.reading} lux</td><td>${sensor.timestamp}</td>`;
+                photoSensorsTable.appendChild(row);
+            });
+
+            data.temperature_sensors.sort((a, b) => a.plant_id - b.plant_id).forEach(sensor => {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td>${sensor.plant_id}</td><td>${sensor.location}</td><td>${sensor.reading} °C</td><td>${sensor.timestamp}</td>`;
+                temperatureSensorsTable.appendChild(row);
+            });
+
+            data.voltage_sensors.sort((a, b) => a.plant_id - b.plant_id).forEach(sensor => {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td>${sensor.plant_id}</td><td>${sensor.location}</td><td>${sensor.reading} V</td><td>${sensor.timestamp}</td>`;
+                voltageSensorsTable.appendChild(row);
+            });
+
+            data.current_sensors.sort((a, b) => a.plant_id - b.plant_id).forEach(sensor => {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td>${sensor.plant_id}</td><td>${sensor.location}</td><td>${sensor.reading} A</td><td>${sensor.timestamp}</td>`;
+                currentSensorsTable.appendChild(row);
+            });
+        };
+
+        // Запрашиваем данные сразу после подключения
+        ws.onopen = function(event) {
+            ws.send('{"action": "get_initial_data"}');
+        };
+    </script>
+</body>
+</html>
