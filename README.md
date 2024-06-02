@@ -11,8 +11,7 @@ Instruction:
    - pip install -r requirements.txt
    - uvicorn app.main:app --reload
 5. Open in browser http://127.0.0.1:8000 for visit your site
-6. If you have done everything correctly, and you see the forms for filling in the data, then congratulations, 
-the program is working correctly
+6. If you have done everything correctly, and you see tables with data, then congratulations, the program is working correctly
 7. If you have some problems with this project please text me:
     @ArtArtas - Telegram
     shkolatlen@gmail.com - Gmail
